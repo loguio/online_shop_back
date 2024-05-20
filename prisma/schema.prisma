@@ -25,3 +25,14 @@ model formation {
   
 
 }
+
+model users {
+  id  String @id @default(uuid())
+  firstName String @unique
+  password String
+
+  refreshToken String?  @db.MediumText
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+}

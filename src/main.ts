@@ -13,6 +13,7 @@ async function bootstrap() {
             stopAtFirstError: false,
         }),
     );
+
     const config = new DocumentBuilder()
         .setTitle("Juror Manager")
         .setDescription("List of api available")
