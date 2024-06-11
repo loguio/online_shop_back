@@ -7,9 +7,9 @@ import {
     Request,
     UseGuards,
 } from "@nestjs/common";
-import { AuthService } from "./AuthService";
+import { AuthService } from "./auth.service";
 import { Public } from "../shared/constants";
-import { CreateUserDto } from "src/users/usersDto/createUserDto";
+import { CreateUserDto } from "src/users/dto/createUserDto";
 import { RefreshTokenGuard } from "src/shared/guards/refreshToken.guard";
 
 @Controller("auth")
@@ -21,7 +21,7 @@ export class AuthController {
     signin(@Body() signinDto: Record<string, any>) {
         console.log(signinDto);
         return this.authService.signIn({
-            firstName: signinDto.firstName,
+            userName: signinDto.userName,
             password: signinDto.password,
         });
     }
@@ -46,8 +46,8 @@ export class AuthController {
     @UseGuards(RefreshTokenGuard)
     @Post("refresh")
     refreshTokens(@Req() req: Request) {
-        const userId = req["user"]["sub"];
+        const userID = req["user"]["sub"];
         const refreshToken = req["user"]["refreshToken"];
-        return this.authService.refreshTokens(userId, refreshToken);
+        return this.authService.refreshTokens(userID, refreshToken);
     }
 }

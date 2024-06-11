@@ -10,29 +10,62 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model formation {
+model article {
   id                String @id @default(uuid())
   name              String @unique
-  shortName         String
-  certificationLvl  Int
-  hoursCount        Float
-  dayCount          Int
-  description       String?
-  isActive          Boolean
+  price             Float
+  image             String
+  users             users[]
+  articleInstance   articleInstance[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  
+model articleInstance {
+  id                String @id @default(uuid())
+  price             Float
+  order             order   @relation(fields:[orderID], references: [id])
+  orderID           String
+  article           article @relation(fields: [articleID],references: [id])
+  articleID         String
+}
 
+model order {
+  id            String @id @default(uuid())
+  articles      articleInstance[]
+  user          users @relation(fields: [userID], references: [id])
+  userID        String
+  shipped       DateTime?
+  shipTo        address @relation(fields: [shipToID],references: [id])
+  shipToID      String  @unique
+  status        orderStatus
 }
 
 model users {
-  id  String @id @default(uuid())
-  firstName String @unique
-  password String
+  id              String @id @default(uuid())
+  userName        String @unique
+  password        String
+  address         address?  @relation(fields: [addressID],references: [id])
+  addressID       String?   @unique
+  order           order[]
+  shoppingCart    article[]
+  refreshToken    String?  @db.MediumText
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
 
-  refreshToken String?  @db.MediumText
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+}
 
+model address {
+  id              String @id @default(uuid())
+  zipCode         String
+  address         String
+  city            String
+  order           order?
+  users           users?
+}
+
+enum orderStatus {
+  CREATED
+  PAID
+  SENT
 }

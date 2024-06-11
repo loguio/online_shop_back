@@ -1,15 +1,17 @@
 import { Module } from "@nestjs/common";
-import { FormationModule } from "./formations/formation.module";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { APP_GUARD } from "@nestjs/core";
 import { AtGuard } from "./auth/auth.guard";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { ConfigModule } from "@nestjs/config";
+import { ArticleModule } from "./article/article.module";
+import { OrderModule } from "./order/order.module";
+import { AddressModule } from "./address/address.module";
+import { ArticleInstanceModule } from "./article-instance/article-instance.module";
 
 @Module({
     imports: [
-        FormationModule,
         AuthModule,
         UsersModule,
         ConfigModule.forRoot({ isGlobal: true }),
@@ -19,6 +21,10 @@ import { ConfigModule } from "@nestjs/config";
                 limit: 100,
             },
         ]),
+        ArticleModule,
+        OrderModule,
+        AddressModule,
+        ArticleInstanceModule,
     ],
     controllers: [],
     providers: [
