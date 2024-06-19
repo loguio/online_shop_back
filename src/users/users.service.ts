@@ -3,6 +3,8 @@ import { users } from "@prisma/client";
 import { PrismaService } from "src/prisma.service";
 import { CreateUserDto } from "./dto/createUserDto";
 import { UpdateUserDto } from "./dto/UpdateUserDto";
+import { User } from "./entities/users.entity";
+import { userSelector } from "./selector/users.selector";
 
 @Injectable()
 export class UsersService {
@@ -14,9 +16,11 @@ export class UsersService {
         });
         return user;
     }
-    async getUserByID(id: string): Promise<users> {
+
+    async getUserByID(id: string): Promise<User> {
         const user = await this.prismaService.users.findUnique({
             where: { id },
+            select: userSelector,
         });
         return user;
     }
@@ -41,8 +45,14 @@ export class UsersService {
                 address: data.address
                     ? { delete: true, create: { ...data.address } }
                     : undefined,
+                lastLogin: new Date(Date.now()),
             },
         });
         return updatedUser;
+    }
+
+    async delete(id: string) {
+        const res = this.prismaService.users.delete({ where: { id } });
+        return res;
     }
 }

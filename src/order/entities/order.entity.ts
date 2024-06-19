@@ -11,3 +11,11 @@ export class Order {
     shipped: Date;
     shipTo: Address;
 }
+
+export class OrderEntity {
+    id: string;
+    status: orderStatus;
+    userID: string;
+    shipped: Date;
+    shipToID: string;
+}

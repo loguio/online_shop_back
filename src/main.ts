@@ -13,6 +13,7 @@ async function bootstrap() {
             stopAtFirstError: false,
         }),
     );
+    app.enableCors({ origin: "http://localhost:5173" });
 
     const config = new DocumentBuilder()
         .setTitle("Juror Manager")
