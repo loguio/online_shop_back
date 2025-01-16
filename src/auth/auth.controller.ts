@@ -9,8 +9,8 @@ import {
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { Public } from "../shared/constants";
-import { CreateUserDto } from "src/users/dto/createUserDto";
 import { RefreshTokenGuard } from "src/shared/guards/refreshToken.guard";
+import { AuthDto } from "./dto/authDto";
 
 @Controller("auth")
 export class AuthController {
@@ -21,7 +21,7 @@ export class AuthController {
     signin(@Body() signinDto: Record<string, any>) {
         console.log(signinDto);
         return this.authService.signIn({
-            userName: signinDto.userName,
+            userName: signinDto.login,
             password: signinDto.password,
         });
     }
@@ -32,8 +32,9 @@ export class AuthController {
     }
 
     @Public()
-    @Post("signup")
-    signup(@Body() createUserDto: CreateUserDto) {
+    @Post("signin")
+    signup(@Body() createUserDto: AuthDto) {
+        console.log("la ?");
         return this.authService.signUp(createUserDto);
     }
 

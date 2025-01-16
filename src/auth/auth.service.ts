@@ -2,7 +2,6 @@ import { ForbiddenException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "src/users/users.service";
-import { CreateUserDto } from "src/users/dto/createUserDto";
 import { AuthDto } from "./dto/authDto";
 import { Tokens } from "./types/tokens.type";
 import { JwtPayload } from "./types/jwtPayload.type";
@@ -15,12 +14,12 @@ export class AuthService {
         private config: ConfigService,
     ) {}
 
-    async signUp(dto: CreateUserDto): Promise<Tokens> {
+    async signUp(dto: AuthDto): Promise<Tokens> {
+        console.log("Creation de l'utilisateur..");
         const user = await this.userService.create({
-            userName: dto.userName,
-            password: dto.password,
+            ...dto,
         });
-
+        console.log("utilisateur crée.");
         const tokens = await this.getTokens(user.id, user.userName);
         await this.updateRtHash(user.id, tokens.refresh_token);
 
