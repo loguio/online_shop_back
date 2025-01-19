@@ -10,25 +10,27 @@ export class RtStrategy extends PassportStrategy(Strategy, "jwt-refresh") {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: config.get<string>("JWT_REFRESH_SECRET"),
-            passReqToCallback: true,
+            passReqToCallback: true, // Permet de recevoir la requête dans validate()
         });
     }
 
     validate(
         req: Request,
-        payload: { accessToken: string },
-    ): { accessToken: string; refreshToken: string } {
+        payload: { sub: string; email: string },
+    ): { sub: string; email: string; refreshToken: string } {
+        // Le refresh token est déjà validé par jwtFromRequest
         const refreshToken = req
             ?.get("authorization")
             ?.replace("Bearer", "")
             .trim();
 
-        if (!refreshToken)
+        if (!refreshToken) {
             throw new ForbiddenException("Refresh token malformed");
+        }
 
         return {
-            ...payload,
-            refreshToken,
+            ...payload, // Ajoute les données du payload (sub, email, etc.)
+            refreshToken, // Ajoute le refreshToken pour un traitement ultérieur
         };
     }
 }

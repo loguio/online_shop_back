@@ -34,7 +34,6 @@ export class AuthController {
     @Public()
     @Post("signin")
     signup(@Body() createUserDto: AuthDto) {
-        console.log("la ?");
         return this.authService.signUp(createUserDto);
     }
 
