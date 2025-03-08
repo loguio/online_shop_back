@@ -77,26 +77,22 @@ export class OrderService {
     }
 
     async update(id: string, updateOrderDto: UpdateOrderDto) {
-        let existingAddress: Address | null = null;
-        try {
-            existingAddress = await this.prismaService.address.findFirstOrThrow(
-                {
-                    where: {
-                        order: { id },
-                    },
-                },
-            );
-        } catch (e) {}
+        const { shipTo } = await this.prismaService.order.findUnique({
+            where: {
+                id,
+            },
+            select: { shipTo: true },
+        });
 
         return await this.prismaService.order.update({
             where: { id },
             data: {
                 shipped: updateOrderDto.shipped,
-                shipTo: existingAddress
+                shipTo: shipTo
                     ? {
                           update: {
                               where: {
-                                  id: existingAddress.id,
+                                  id: shipTo.id,
                               },
                               data: { ...updateOrderDto.shipTo },
                           },

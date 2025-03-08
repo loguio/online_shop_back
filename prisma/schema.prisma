@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -28,6 +25,9 @@ model articleInstance {
   orderID           String
   article           article @relation(fields: [articleID],references: [id])
   articleID         String
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
 }
 
 model order {
@@ -39,6 +39,9 @@ model order {
   shipTo        address @relation(fields: [shipToID],references: [id])
   shipToID      String  @unique
   status        orderStatus
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
 }
 
 model users {
@@ -54,8 +57,6 @@ model users {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
-
-
 }
 
 model address {
@@ -63,8 +64,8 @@ model address {
   zipCode         String
   address         String
   city            String
-  order           order?
-  users           users?
+  order           order[]
+  users           users[]
 }
 
 enum orderStatus {

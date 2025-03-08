@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateArticleDto } from "./dto/create-article.dto";
 import { UpdateArticleDto } from "./dto/update-article.dto";
 import { PrismaService } from "src/prisma.service";
-import { Article } from "./entities/article.entity";
+import { Article, ArticleEntity } from "./entities/article.entity";
 import { articleSelector } from "./selector/article.selector";
 
 @Injectable()
@@ -10,14 +10,28 @@ export class ArticleService {
     constructor(private readonly prismaService: PrismaService) {}
 
     async create(createArticleDto: CreateArticleDto): Promise<Article> {
-        const result = await this.prismaService.article.create({
-            data: { ...createArticleDto },
+        let result: ArticleEntity;
+        const productName = await this.prismaService.article.findUnique({
+            where: { name: createArticleDto.name },
         });
+        console.log(productName);
+        if (productName) {
+            throw new BadRequestException(
+                "Un produit du même nom éxiste déjà.",
+            );
+        }
+        try {
+            result = await this.prismaService.article.create({
+                data: { ...createArticleDto },
+            });
+        } catch (e) {
+            console.error(e);
+        }
         return result;
     }
 
     async findAll(): Promise<Article[]> {
-        let result;
+        let result: Article[];
         try {
             result = await this.prismaService.article.findMany({
                 select: articleSelector,
@@ -28,12 +42,13 @@ export class ArticleService {
         return result;
     }
 
-    async findOne(id: string) {
-        let result;
+    async findOne(id: string): Promise<Article> {
+        let result: Article;
         try {
             result = await this.prismaService.article.findUniqueOrThrow({
-                include: { users: true },
+                // include: { users: true },
                 where: { id },
+                select: articleSelector,
             });
         } catch (e) {
             throw new BadRequestException();
