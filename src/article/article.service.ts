@@ -17,7 +17,7 @@ export class ArticleService {
         console.log(productName);
         if (productName) {
             throw new BadRequestException(
-                "Un produit du même nom éxiste déjà.",
+                "Un produit du même nom existe déjà.",
             );
         }
         try {
