@@ -1,5 +1,5 @@
 import { Address } from "src/address/entities/address.entity";
-import { ArticleEntity } from "src/article/entities/article.entity";
+import { ArticleEntity } from "src/product/entities/product.entity";
 import { OrderEntity } from "src/order/entities/order.entity";
 
 export class User {

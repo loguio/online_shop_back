@@ -7,53 +7,76 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model article {
+model product {
   id                String @id @default(uuid())
   name              String @unique
   price             Float
-  image             String
-  users             users[]
-  articleInstance   articleInstance[]
+  images            productImage[]
+  orderItems        orderItem[]
+  cartItems         cartItem[]
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @default(now()) @updatedAt
 }
 
-model articleInstance {
+model productImage {
   id                String @id @default(uuid())
-  price             Float
-  order             order   @relation(fields:[orderID], references: [id])
-  orderID           String
-  article           article @relation(fields: [articleID],references: [id])
-  articleID         String
+  product           product @relation(fields: [productId],references: [id])
+  productId         String @unique
+  fileName          String @unique
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
 }
-
 model order {
   id            String @id @default(uuid())
-  articles      articleInstance[]
-  user          users @relation(fields: [userID], references: [id])
+  user          user @relation(fields: [userID], references: [id])
   userID        String
-  shipped       DateTime?
+  status        orderStatus
   shipTo        address @relation(fields: [shipToID],references: [id])
   shipToID      String  @unique
-  status        orderStatus
+  total         Float
+  orderItems    orderItem[]
+  orderHistory  orderHistory[]
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @default(now()) @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
 }
 
-model users {
+model orderItem {
+  id            String @id @default(uuid())
+  order         order @relation(fields: [orderId],references: [id])
+  orderId       String @unique
+  quantity      Int
+  product       product @relation(fields: [productId], references: [id])
+  productId     String @unique
+  price         Float
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+}
+
+model orderHistory {
+  id            String @id @default(uuid())
+  order         order @relation(fields: [orderId],references: [id])
+  orderId       String @unique
+  status        orderStatus
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+}
+model user {
   id              String @id @default(uuid())
-  userName        String @unique
+  email           String @unique
   password        String
   address         address?  @relation(fields: [addressID],references: [id])
   addressID       String?   @unique
   order           order[]
-  shoppingCart    article[]
   refreshToken    String?  @db.MediumText
   lastLogin       DateTime?
+  cart            cart? 
+  cartId          String? @unique
+  role            role
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now()) @updatedAt
@@ -65,11 +88,41 @@ model address {
   address         String
   city            String
   order           order[]
-  users           users[]
+  users           user[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+}
+
+model cart {
+  id              String @id @default(uuid())
+  user            user @relation(fields:[userId], references: [id])
+  userId          String @unique
+  cartItems       cartItem[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+}
+
+model cartItem {
+  id              String @id @default(uuid())
+  quantity        Int
+  cart            cart @relation(fields:[cartId], references: [id])
+  cartId          String   @unique
+  product         product @relation(fields: [productId], references: [id])
+  productId       String @unique
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
 }
 
 enum orderStatus {
   CREATED
   PAID
   SENT
+}
+
+enum role {
+  ROLE_ADMIN
+  ROLE_USER
 }

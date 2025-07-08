@@ -5,16 +5,16 @@ import { PrismaService } from "src/prisma.service";
 import { orderStatus } from "@prisma/client";
 import { Address } from "src/address/entities/address.entity";
 import { orderSelector } from "./selector/order.selector";
-import { Article } from "src/article/entities/article.entity";
+import { Product } from "src/product/entities/product.entity";
 import { AddressService } from "src/address/address.service";
-import { ArticleInstanceService } from "src/article-instance/article-instance.service";
+import { CartItemService } from "src/cart-item/cart-item.service";
 
 @Injectable()
 export class OrderService {
     constructor(
         readonly prismaService: PrismaService,
         readonly addressService: AddressService,
-        readonly articleInstanceService: ArticleInstanceService,
+        readonly cartItemService: CartItemService,
     ) {}
 
     async create(createOrderDto: CreateOrderDto) {
@@ -31,9 +31,9 @@ export class OrderService {
             );
         } catch (e) {}
 
-        let listArticles: Article[] | null = null;
+        let listArticles: Product[] | null = null;
         try {
-            listArticles = await this.prismaService.article.findMany({
+            listArticles = await this.prismaService.product.findMany({
                 where: { id: { in: createOrderDto.articleIDs } },
             });
         } catch (e) {}
@@ -41,7 +41,7 @@ export class OrderService {
         return await this.prismaService.order.create({
             data: {
                 user: { connect: { id: createOrderDto.userID } },
-                articles: {
+                orderItems: {
                     createMany: {
                         data: listArticles.map((el) => ({
                             articleID: el.id,
